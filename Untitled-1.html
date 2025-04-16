@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRF 查询系统</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #555;
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .success {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>TRF 查询系统</h1>
+        <div>
+            <label for="trfInput">请输入 TRF 编号：</label>
+            <input type="text" id="trfInput" placeholder="例如: 23CN315347PANG901A">
+        </div>
+        <button onclick="submitTRF()">查询</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function submitTRF() {
+            const trfValue = document.getElementById("trfInput").value;
+            if (!trfValue) {
+                alert("请输入 TRF 编号！");
+                return;
+            }
+
+            const apiUrl = `http://82.156.27.84:5173/api/score/search?trf=${trfValue}`;
+
+            // 发起请求
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById("result");
+                    resultDiv.innerHTML = ''; // 清空之前的结果
+
+                    if (data.success) {
+                        // 显示成功结果和图片
+                        const img = new Image();
+                        img.src = data.data.image;
+                        resultDiv.innerHTML = `<h2 class="success">查询成功！</h2>`;
+                        resultDiv.appendChild(img);
+                    } else {
+                        resultDiv.innerHTML = `<h2 class="error">查询失败，未找到数据。</h2>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("请求失败:", error);
+                    document.getElementById("result").innerHTML = `<h2 class="error">查询失败，请稍后重试。</h2>`;
+                });
+        }
+    </script>
+
+</body>
+</html>
